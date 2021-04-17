@@ -1,0 +1,46 @@
+version: '2.1'
+
+services:
+
+  ies:
+    container_name: ies
+    image: avapolos/postgres:bdr
+    environment:
+     - POSTGRES_PASSWORD=L5Pojz33jND5
+     - APP_USER=moodle
+     - APP_PASSWORD=gA7cyJtPZdVH
+     - APP_DB=moodle
+    networks:
+      db:
+    restart: unless-stopped
+
+  polo:
+    container_name: polo
+    image: avapolos/postgres:bdr
+    environment:
+     - POSTGRES_PASSWORD=L5Pojz33jND5
+     - APP_USER=moodle
+     - APP_PASSWORD=gA7cyJtPZdVH
+     - APP_DB=moodle
+    networks:
+      db:
+    restart: unless-stopped
+
+  bootstrapper:
+    container_name: bootstrapper
+    image: avapolos/bootstrapper:latest
+    build: .
+    environment:
+     - POSTGRES_PASSWORD=L5Pojz33jND5
+     - APP_USER=moodle
+     - APP_PASSWORD=gA7cyJtPZdVH
+     - APP_DB=moodle
+     - REPLICATION_PEER1=ies
+     - REPLICATION_PEER2=polo
+     - REPLICATION_PASSWORD=J44eW8g6JAmk
+    networks:
+      db:
+
+networks:
+  db:
+
