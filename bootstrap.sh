@@ -105,6 +105,9 @@ setup_replication() {
   peer2SQL --dbname="$APP_DB" <<<"SELECT bdr.wait_slot_confirm_lsn(NULL, NULL)"
 
   echo "Checking if it was replicated."
+
+  peer2SQL --dbname="$APP_DB" <<<"SELECT * FROM avapolos_sync;"
+
   if ! [[ -z "$(peer2SQL --dbname="$APP_DB" <<<"SELECT * FROM avapolos_sync;" | grep -o row)" ]]; then
     echo
     echo 'Replication set up successfully.'

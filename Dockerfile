@@ -1,12 +1,11 @@
 FROM alpine:3.13
 
-RUN apk update
+WORKDIR /root
 
-RUN apk add --upgrade bash postgresql-bdr-client
+RUN apk add bash postgresql-bdr-client
 
-COPY bootstrap.sh .
+COPY . ./
 
 RUN chmod +x bootstrap.sh
 
 CMD ["/bootstrap.sh"]
-
