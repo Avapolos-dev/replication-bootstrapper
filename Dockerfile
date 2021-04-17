@@ -1,7 +1,5 @@
 FROM alpine:3.13
 
-WORKDIR /root
-
 RUN apk add bash postgresql-bdr-client
 
 COPY . ./
