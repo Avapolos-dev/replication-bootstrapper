@@ -98,7 +98,7 @@ setup_replication() {
     createdAt timestamptz not null DEFAULT NOW(),
     instance char(4) not null,
     iteration int not null,
-    operation char(1) not null,
+    operation char(1) not null
   );"
 
   peer1SQL --dbname="$APP_DB" <<<"SELECT bdr.wait_slot_confirm_lsn(NULL, NULL)"
