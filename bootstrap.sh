@@ -91,14 +91,14 @@ setup_replication() {
   peer2SQL --dbname="$APP_DB" <<<"SELECT bdr.bdr_node_join_wait_for_ready()"
   peer2SQL --dbname="$APP_DB" <<<"SELECT bdr.bdr_nodes.node_status FROM bdr.bdr_nodes;"
 
+  # moodle_user varchar(255) not null
   echo "Creating avapolos_sync table."
   peer1SQL --dbname="$APP_DB" <<<"CREATE TABLE avapolos_sync (
     id serial not null PRIMARY KEY,
-    instancia char(4) not null,
-    versao int not null,
-    tipo char(1) not null,
-    data timestamptz not null DEFAULT NOW(),
-    moodle_user varchar(255) not null
+    createdAt timestamptz not null DEFAULT NOW(),
+    instance char(4) not null,
+    iteration int not null,
+    operation char(1) not null,
   );"
 
   peer1SQL --dbname="$APP_DB" <<<"SELECT bdr.wait_slot_confirm_lsn(NULL, NULL)"
