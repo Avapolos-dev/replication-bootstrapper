@@ -2,9 +2,9 @@ version: '2.1'
 
 services:
 
-  ies:
-    container_name: ies
-    image: avapolos/postgres:bdr
+  main-db:
+    container_name: main-db
+    image: avapolos/postgres-bdr:latest
     environment:
      - POSTGRES_PASSWORD=L5Pojz33jND5
      - APP_USER=moodle
@@ -14,9 +14,9 @@ services:
       db:
     restart: unless-stopped
 
-  polo:
-    container_name: polo
-    image: avapolos/postgres:bdr
+  sync-db:
+    container_name: sync-db
+    image: avapolos/postgres-bdr:latest
     environment:
      - POSTGRES_PASSWORD=L5Pojz33jND5
      - APP_USER=moodle
@@ -26,20 +26,45 @@ services:
       db:
     restart: unless-stopped
 
-  bootstrapper:
-    container_name: bootstrapper
-    image: avapolos/bootstrapper:latest
+  replication-bootstrapper:
+    container_name: replication-bootstrapper
+    image: avapolos/replication-bootstrapper:latest
     build: .
     environment:
      - POSTGRES_PASSWORD=L5Pojz33jND5
      - APP_USER=moodle
      - APP_PASSWORD=gA7cyJtPZdVH
      - APP_DB=moodle
-     - REPLICATION_PEER1=ies
-     - REPLICATION_PEER2=polo
+     - REPLICATION_MAIN=main-db
+     - REPLICATION_SYNC=sync-db
      - REPLICATION_PASSWORD=J44eW8g6JAmk
     networks:
       db:
+    depends_on:
+      main-db:
+        condition: service_healthy
+      sync-db:
+        condition: service_healthy
+
+  # moodle:
+  #   container_name: moodle
+  #   image: avapolos/moodle
+  #   ports:
+  #     - 8080:80
+  #   environment:
+  #     - DEBUG=true
+  #     - DB_HOST=main-db
+  #     - DB_NAME=moodle
+  #     - DB_USER=moodle
+  #     - DB_PASS=gA7cyJtPZdVH
+  #     - REPLICATION_PEER1=main-db
+  #     - REPLICATION_PEER2=sync-db
+  #     - WWW_ROOT=http://localhost:8080
+  #   networks:
+  #     db:
+  #   depends_on:
+  #     replication-bootstrapper:
+  #       condition: service_completed_successfully
 
 networks:
   db:
