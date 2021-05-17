@@ -37,6 +37,13 @@ file_env 'REPLICATION_PASSWORD' 'default'
 file_env 'REPLICATION_MAIN' ''
 file_env 'REPLICATION_SYNC' ''
 
+# $1 -> host
+wait_for_db() {
+  until pg_isready -h "$1"; do
+    sleep 1
+  done
+}
+
 #usage: sql HOST USER PASS args
 sql() {
   export PGPASSWORD="$3"
@@ -56,6 +63,9 @@ is_replication_working() {
   echo
   echo "Testing replication."
   echo
+
+  wait_for_db "$REPLICATION_MAIN"
+  wait_for_db "$REPLICATION_SYNC"
 
   if ! peer2SQL --dbname="$APP_DB" <<<"SELECT * FROM sync_test;" | grep -q row; then
     echo "Test table does not exist, replication is definetly not working."
@@ -85,6 +95,9 @@ setup_replication() {
   echo
   echo 'Setting up AVAPolos replication'
   echo
+
+  wait_for_db "$REPLICATION_MAIN"
+  wait_for_db "$REPLICATION_SYNC"
 
   echo "Enabling BDR on app database."
   peer1SQL --dbname="$APP_DB" <<<"CREATE EXTENSION btree_gist;"
